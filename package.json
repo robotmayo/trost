@@ -4,7 +4,8 @@
   "description": "A nodejs blogging platform",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "ava",
+    "docs": "documentation build src/* -o docs -f html"
   },
   "author": "robotmayo",
   "license": "GPL-3.0",
@@ -18,6 +19,7 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^0.16.0"
+    "ava": "^0.16.0",
+    "documentation": "^4.0.0-beta10"
   }
 }

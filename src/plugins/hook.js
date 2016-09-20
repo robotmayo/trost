@@ -9,24 +9,42 @@ const HOOK_TYPES = {
   ACTION : 'action'
 };
 const HOOK_TYPES_ARR = [HOOK_TYPES.FILTER, HOOK_TYPES.STATIC, HOOK_TYPES.ACTION];
+
+/**
+ * @namespace Plugins
+ */
 const Plugins = {
-  hookMap : new Map()
+  /**
+   * @memberOf Plugins
+   * @type {Map<String,hookData>}
+   */
+  hookMap : new Map(),
+  addHook,
+  fireHook,
+  fireActionHook,
+  fireFilterHook,
+  fireStaticHook
 };
 module.exports = Plugins;
 
 /**
- * Hooks come in 2 types action, filter, static
+ * 
+ * @typedef {Object} hookData
+ * @property {string} hook
+ * @property {number} priority
+ * @property {function(context:object):Promise<Any|Error>} fn
+ * @property {number} id pluginID 
  */
 
+
 /**
- * 
- * 
+ * @memberof Plugins
  * @param {number}   pluginID
  * @param {object}   opts
  * @param {string}   opts.hook
  * @param {number}   opts.priority
  * @param {function} opts.fn
- * @returns {Promise<Resolve|Error>}
+ * @returns {Promise<undefined|Error>}
  */
 function addHook(pluginID, opts){
   if(pluginID == null) return Promise.reject(new Error('PluginID required'));
@@ -40,8 +58,14 @@ function addHook(pluginID, opts){
   Plugins.hookMap.get(data.hook).push(data);
   return Promise.resolve();
 }
-Plugins.addHook = addHook;
 
+/**
+ * 
+ * @memberof Plugins
+ * @param {string} hook
+ * @param {object} context
+ * @returns {Promise<Any|Error>}
+ */
 function fireHook(hook, context){
   const hookType = hook.split('::')[0];
   if(HOOK_TYPES.indexOf(hookType) === -1) return Promise.reject(new Error('Invalid hooktype'));
@@ -51,15 +75,28 @@ function fireHook(hook, context){
   else if(hookType === HOOK_TYPES.STATIC) return fireStaticHook(hooks, context);
   else if(hookType === HOOK_TYPES.ACTION) return fireActionHook(hooks, context);
 }
-Plugins.fireHook = fireHook;
 
+
+/**
+ * 
+ * @memberof Plugins
+ * @param {hookData[]} hooks
+ * @param {object} context
+ * @returns {Promise<Any|Error>}
+ */
 function fireFilterHook(hooks, context){
   return Promise.reduce(hooks, function(accum, data){
     return data.fn(accum);
   }, context);
 }
-Plugins.fireFilterHook = fireFilterHook;
 
+/**
+ * 
+ * @memberof Plugins
+ * @param {hookData[]} hooks
+ * @param {object} context
+ * @returns {Promise<Any|Error>}
+ */
 function fireStaticHook(hooks, context){
   return Promise.each(hooks, function(data){
     return data.fn(context)
@@ -72,15 +109,17 @@ function fireStaticHook(hooks, context){
     })
   });
 }
-Plugins.fireStaticHook = fireStaticHook;
 
+/**
+ * 
+ * @memberof Plugins
+ * @param {hookData[]} hooks
+ * @param {object} context
+ * @returns {Promise<Any|Error>}
+ */
 function fireActionHook(hooks, context){
   return Promise.all(hooks.map(d => d.fn(context)));
 }
-Plugins.fireActionHook = fireActionHook;
-
-
-
 
 
 
