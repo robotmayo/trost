@@ -10,17 +10,18 @@
   "author": "robotmayo",
   "license": "GPL-3.0",
   "dependencies": {
-    "bluebird": "^3.4.6",
-    "body-parser": "^1.15.2",
-    "express": "^4.14.0",
-    "express-hbs": "^1.0.3",
-    "express-session": "^1.14.1",
-    "logbro": "^1.2.0",
-    "passport": "^0.3.2",
-    "passport-local": "^1.0.0"
+    "bluebird": "3.4.6",
+    "body-parser": "1.15.2",
+    "express": "4.14.0",
+    "express-hbs": "1.0.3",
+    "express-session": "1.14.1",
+    "logbro": "1.2.0",
+    "passport": "0.3.2",
+    "passport-local": "1.0.0"
   },
   "devDependencies": {
-    "ava": "^0.16.0",
-    "documentation": "^4.0.0-beta10"
+    "ava": "0.16.0",
+    "documentation": "4.0.0-beta10",
+    "eslint": "^3.5.0"
   }
 }
