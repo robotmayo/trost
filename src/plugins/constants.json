@@ -1,0 +1,7 @@
+{
+  "HOOK_TYPES": {
+    "FILTER": "filter",
+    "STATIC": "static",
+    "ACTION": "action"
+  }
+}
