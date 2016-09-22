@@ -1,6 +1,9 @@
 Trost
 =====
 
+[![Build Status](https://travis-ci.org/robotmayo/trost.svg?branch=master)](https://travis-ci.org/robotmayo/trost)
+[![Code Climate](https://codeclimate.com/github/robotmayo/trost/badges/gpa.svg)](https://codeclimate.com/github/robotmayo/trost)
+
 Trost is a simple blogging platform built with Node.js. It is designed to be simple and easy to use
 for both the reader and the author. With theme and plugin support it can be customized to fit your
 ever changing needs.

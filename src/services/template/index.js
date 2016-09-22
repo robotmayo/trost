@@ -1,7 +1,17 @@
 const exhbs = require('express-hbs');
 const log = require('logbro');
 
+const cerr = require('../../utils/cerr');
+
 const themePath = require('path').join(__dirname, '../../theme');
+const {
+  ValidationError
+} = cerr;
+
+/**
+ * 
+ * @namespace TemplateService
+ */
 
 /**
  * 
@@ -27,7 +37,6 @@ module.exports.create = function (creationOpts) {
 
   /**
    * 
-   * 
    * @typedef {object} TemplateRootObject
    * @property {string} path Path to the template
    * @property {number} sourceId Souce themes id
@@ -36,22 +45,22 @@ module.exports.create = function (creationOpts) {
 
   /**
    * Register a template
+   * @memberof TemplateService
    * @param {number} sourceThemeId Id of the source theme
    * @param {string} name Name/key for the template eg: index -> index.hbs
    * @param {string} path
    * @throws {Error}
    */
   function registerTemplate(sourceThemeId, name, path) {
-    if (sourceThemeId == null) throw new Error('SourceID cannont be null');
-    if (name == null || name === '') throw new Error('name cannot be empty');
-    if (path == null || path === '') throw new Error('path cannot be empty');
+    if (sourceThemeId == null) throw new ValidationError('sourceThemeId must be a number');
+    if (typeof name !== 'string' || name === '') throw new ValidationError('name must be a string and not empty');
+    if (typeof path !== 'string' || path === '') throw new ValidationError('path must be a string and not empty');
     let templatesRoot = TemplateService.templates.get(name);
     if (!templatesRoot) {
       templatesRoot = {
         active: {},
         _default: {}
       };
-      TemplateService.templates.set(name, templatesRoot);
     }
     if (sourceThemeId === 0) {
       // 0 is the default theme
@@ -64,6 +73,8 @@ module.exports.create = function (creationOpts) {
       path,
       sourceThemeId
     };
+    TemplateService.templates.set(name, templatesRoot);
+    return Object.assign({}, templatesRoot);
   }
   TemplateService.registerTemplate = registerTemplate;
 
@@ -79,6 +90,7 @@ module.exports.create = function (creationOpts) {
     if (!t) throw new Error(`Unable to find template of  + ${name}`);
     return t.active ? t.active : t._default;
   }
+  TemplateService.getTemplate = getTemplate;
 
   /**
    * 
@@ -92,10 +104,8 @@ module.exports.create = function (creationOpts) {
     const opts = options || {};
     opts._locals = res.locals || {};
     opts.settings = {};
-    log.info('Calling render');
-    const templateRootObject = getTemplate(template);
-    log.trace(templateRootObject);
-    TemplateService._render(templateRootObject.path, opts, function (err, html) {
+    const templateRootObject = TemplateService.getTemplate(template);
+    TemplateService.hbsRender(templateRootObject.path, opts, function (err, html) {
       cb(err, html);
     });
   }
@@ -111,7 +121,7 @@ module.exports.create = function (creationOpts) {
    */
   function renderMiddleware(req, res, next) {
     res.trostRender = function (template, opts, cb) {
-      return render(res, template, opts, function (err, html) {
+      return TemplateService.render(res, template, opts, function (err, html) {
         if (cb) return cb(err, html);
         if (err) return req.next(err);
         return res.send(html);
@@ -120,4 +130,5 @@ module.exports.create = function (creationOpts) {
     next();
   }
   TemplateService.renderMiddleware = renderMiddleware;
+  return TemplateService;
 };
