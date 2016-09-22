@@ -1,7 +1,9 @@
 const exhbs = require('express-hbs');
 const log = require('logbro');
 
+
 const cerr = require('../../utils/cerr');
+const capture = require('../../utils/capture');
 
 const themePath = require('path').join(__dirname, '../../theme');
 const {
@@ -104,8 +106,9 @@ module.exports.create = function (creationOpts) {
     const opts = options || {};
     opts._locals = res.locals || {};
     opts.settings = {};
-    const templateRootObject = TemplateService.getTemplate(template);
-    TemplateService.hbsRender(templateRootObject.path, opts, function (err, html) {
+    const capTemplateRootObject = capture(() => TemplateService.getTemplate(template));
+    if(capTemplateRootObject.err) return cb(capTemplateRootObject.err);
+    return void TemplateService.hbsRender(capTemplateRootObject.value.path, opts, function (err, html) {
       cb(err, html);
     });
   }
