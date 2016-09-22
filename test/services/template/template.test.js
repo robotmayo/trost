@@ -70,3 +70,42 @@ test('render', function(t){
     t.truthy(v, 'render callback called');
   });
 });
+
+test('renderMiddleware', function(t){
+  const TS = TemplateService.create();
+  const workingGT = () => {
+    return {path: 'path'};
+  };
+  TS.getTemplate = workingGT;
+  TS.hbsRender = function(path, opts, cb){
+    cb(null, 'html');
+  };
+  const req = {
+    next: function(err){
+      t.truthy(err);
+    }
+  };
+  const res = {
+    _locals : {},
+    send: function(html){
+      t.is(html, 'html');
+    }
+  };
+  TS.renderMiddleware(req, res, () => t.pass('Next is called'));
+  res.trostRender('index', {}, function(err, str){
+    t.falsy(err);
+    t.is(str, 'html');
+  });
+  TS.getTemplate = () => {
+    throw new Error();
+  };
+  TS.renderMiddleware(req, res, noop);
+  res.trostRender('index', {}, function(err){
+    t.truthy(err);
+  });
+  TS.renderMiddleware(req, res, noop);
+  res.trostRender('index', {});
+  TS.getTemplate = workingGT;
+  TS.renderMiddleware(req, res, noop);
+  res.trostRender('index', {});
+});
