@@ -6,9 +6,8 @@ const session = require('express-session');
 const bodyparser = require('body-parser');
 const log = require('logbro');
 
-const TemplateService = require('./services/template');
-TemplateService.registerTemplate(0, 'index', require('path').join(__dirname, '../theme/friend/index.hbs'));
-TemplateService.registerTemplate(1, 'index', require('path').join(__dirname, '../theme/override/index.hbs'));
+const TemplateService = require('./services/template').create();
+TemplateService.setActiveTheme('friend');
 
 const App = express();
 const server = http.createServer(App);

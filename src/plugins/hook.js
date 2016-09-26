@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const log = require('logbro');
 
 const HOOK_TYPES = require('./constants').HOOK_TYPES;
-const HOOK_TYPES_ARR = [HOOK_TYPES.FILTER, HOOK_TYPES.STATIC, HOOK_TYPES.ACTION];
+const HOOK_TYPES_ARR = [HOOK_TYPES.REDUCE, HOOK_TYPES.STATIC, HOOK_TYPES.ACTION];
 const DEFAULT_PRIORITY = 5;
 
 module.exports = function hookInit(Plugins) {
@@ -51,12 +51,12 @@ module.exports = function hookInit(Plugins) {
    * @param {object} context
    * @returns {Promise<Any|Error>}
    */
-  function fireFilterHook(hooks, context) {
-    return Promise.reduce(hooks, function filterHookReduce(accum, data) {
+  function fireReduceHook(hooks, context) {
+    return Promise.reduce(hooks, function reduceHookFn(accum, data) {
       return data.fn(accum);
     }, context);
   }
-  Plugins.fireFilterHook = fireFilterHook;
+  Plugins.fireReduceHook = fireReduceHook;
 
   /**
    * 
@@ -103,7 +103,7 @@ module.exports = function hookInit(Plugins) {
     if (HOOK_TYPES_ARR.indexOf(hookType) === -1) return Promise.reject(new Error('Invalid hooktype'));
     const hooks = Plugins.hookMap.get(hook);
     if (!hooks) return Promise.resolve(context);
-    if (hookType === HOOK_TYPES.FILTER) return fireFilterHook(hooks, context);
+    if (hookType === HOOK_TYPES.REDUCE) return fireReduceHook(hooks, context);
     else if (hookType === HOOK_TYPES.STATIC) return fireStaticHook(hooks, context);
     else if (hookType === HOOK_TYPES.ACTION) return fireActionHook(hooks, context);
     return Promise.reject(new Error('Invalid hooktype'));

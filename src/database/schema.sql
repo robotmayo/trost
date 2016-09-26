@@ -35,6 +35,7 @@ CREATE TABLE trost_users(
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_by INT NOT NULL,
   visibility VARCHAR(50) NOT NULL DEFAULT 'public', -- See data/user for all default types
+  UNIQUE INDEX `email`(`email`),
   UNIQUE INDEX `username`(`username`)
 );
 

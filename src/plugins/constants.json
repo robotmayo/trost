@@ -1,6 +1,6 @@
 {
   "HOOK_TYPES": {
-    "FILTER": "filter",
+    "REDUCE": "reduce",
     "STATIC": "static",
     "ACTION": "action"
   }

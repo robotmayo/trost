@@ -1,6 +1,6 @@
 import test from 'ava';
-import TemplateService from '../../../src/services/template';
-import {ValidationError} from '../../../src/utils/cerr';
+import TemplateService from '../../src/services/template';
+import {ValidationError} from '../../src/utils/cerr';
 
 const noop = f => f;
 
