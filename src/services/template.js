@@ -41,20 +41,20 @@ module.exports = function TemplateServiceCreate(tsOpts) {
    * 
    * @typedef {object} TemplateRootObject
    * @property {string} path Path to the template
-   * @property {number} sourceId Souce themes id
+   * @property {string} sourceTheme Name of source theme
    */
 
 
   /**
    * Register a template
    * @memberof TemplateService
-   * @param {number} sourceThemeId Id of the source theme
+   * @param {string} sourceTheme Id of the source theme
    * @param {string} name Name/key for the template eg: index -> index.hbs
    * @param {string} path
    * @throws {Error}
    */
-  function registerTemplate(sourceThemeId, name, path) {
-    if (sourceThemeId == null) throw new ValidationError('sourceThemeId must be a number');
+  function registerTemplate(sourceTheme, name, path) {
+    if (sourceTheme == null) throw new ValidationError('sourceTheme must be a number');
     if (typeof name !== 'string' || name === '') throw new ValidationError('name must be a string and not empty');
     if (typeof path !== 'string' || path === '') throw new ValidationError('path must be a string and not empty');
     let templatesRoot = TemplateService.templates.get(name);
@@ -64,16 +64,15 @@ module.exports = function TemplateServiceCreate(tsOpts) {
         _default: {}
       };
     }
-    if (sourceThemeId === 0) {
-      // 0 is the default theme
+    if (sourceTheme === 'default') {
       templatesRoot._default = {
         path,
-        sourceThemeId
+        sourceTheme
       };
     }
     templatesRoot.active = {
       path,
-      sourceThemeId
+      sourceTheme
     };
     TemplateService.templates.set(name, templatesRoot);
     return Object.assign({}, templatesRoot);
@@ -95,6 +94,7 @@ module.exports = function TemplateServiceCreate(tsOpts) {
         }
         const templateName = fileStat.name.split('.')[0];
         TemplateService.registerTemplate(themeName, templateName, resolvePath(root, fileStat.name));
+        next();
       });
       walker.on('error', function(root, stats){
         // May return multiple errors but lets only reject on the first
@@ -103,7 +103,7 @@ module.exports = function TemplateServiceCreate(tsOpts) {
         statArr.forEach(node => log.error(`[TemplateService::setActiveTheme] ${node.err.message}`));
         reject(statArr[0].error);
       });
-      walker.on('end', () => resolve());
+      walker.on('end', resolve);
     });
     
   }
