@@ -145,7 +145,7 @@
     "id-blacklist" : [2, "flavorTown"],
     "id-length" : 0,
     "id-match" : 0,
-    "indent" :  [2, 2],
+    "indent" :  ["error", 2, { "SwitchCase": 1} ],
     "jsx-quotes" : 2,
     "key-spacing": 2,
     "keyword-spacing" : 0,
