@@ -1,16 +1,46 @@
 const bcrypt = require('bcryptjs');
 
 const UserService = require('./user');
+const {ValidationError} = require('../utils/cerr');
 
-const AuthService = {
-  SECRET: 'donttusttheclownq'
+module.exports = function(authOpts) {
+  const AuthService = Object.assign({
+    SECRET: 'donttusttheclownq'
+  }, authOpts);
+
+  AuthService.register = function register(email, password) {
+    const hashedPW = bcrypt.hashSync(password);
+    return UserService.saveUser({email, password: hashedPW});
+  };
+
+  AuthService.login = function login(email, password){
+    UserService.getUserByEmail(email)
+    .then(user => {
+      if(bcrypt.compareSync(password, user.password) === false){
+        return Promise.reject(new ValidationError('INVALID PASSWORD'));
+      }
+      return user;
+    });
+  };
+
+  AuthService.passportLogin = function passportLogin(email, password, done) {
+    AuthService.login(email, password)
+    .then(user => done({id: user.id}))
+    .catch(done);
+  };
+
+  AuthService.serialzeUser = function serialzeUser(user, done){
+    done(null, user);
+  };
+
+  AuthService.deserializeUser = function deserializeUser(id, done){
+    UserService.getUserById(id)
+    .then(userData => {
+      done(null, userData);
+    })
+    .catch(done);
+  };
+
+  return AuthService;
+
 };
-module.exports = AuthService;
-
-AuthService.login = function AuthLogin(username, password, done){
-  const hashedPW = bcrypt.hashSync(password);
-  return UserService.saveUser({username, password: hashedPW})
-  .then(user => done(null, user))
-  .catch(done);
-};
-

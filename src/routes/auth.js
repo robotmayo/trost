@@ -2,7 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const log = require('logbro');
 
-const AuthService = require('../services/auth');
+const AuthService = require('../services').AuthService;
 
 
 const Auth = {};
@@ -47,7 +47,7 @@ Auth.logout = function(req, res){
 
 Auth.mountRoutes = function mountRoutes(router){
   //TODO: Dynamically load multiple strategies, eg : let people login via twitter to post a commnet
-  passport.use(new LocalStrategy(AuthService.login));
+  passport.use(new LocalStrategy(AuthService.passportLogin));
   //TODO: Properly handle redirects, eg send them back to the page they came from
   router.post('/login', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/login'}));
   router.post('/register', Auth.register);
