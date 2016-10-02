@@ -1,5 +1,5 @@
 import test from 'ava';
-import CreateHook from '../../src/plugins/hook';
+import CreateHook from '../../../src/plugins/hook';
 
 test('Plugins.addHook', function(t){
   const Plugins = CreateHook({});

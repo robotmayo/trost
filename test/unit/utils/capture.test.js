@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import capture from '../../src/utils/capture';
+import capture from '../../../src/utils/capture';
 
 test('capture', function(t){
   const c = capture(() => {

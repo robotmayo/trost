@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import query from '../../src/utils/query';
+import query from '../../../src/utils/query';
 
 test('query.js', async function(t){
   const expectedQueryString = 'SELECT * FROM stuff;';
