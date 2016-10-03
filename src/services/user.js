@@ -16,7 +16,7 @@ const GET_BY_ID = `
 `;
 
 module.exports = function (userOpts) {
-  const UserService = Object.assign({ connection: require('../db') }, userOpts);
+  const UserService = Object.assign({connection: null}, userOpts);
 
   UserService.saveUser = function saveUser(email, username, password) {
     if (!email) throw new ValidationError('EMAIL REQUIRED');
@@ -34,7 +34,7 @@ module.exports = function (userOpts) {
       case 'id':
         return query(UserService.connection, GET_BY_ID, args);
       default:
-        return Promise.reject(new ValidationError(`INVALID TYPE OF ${type}`))
+        return Promise.reject(new ValidationError(`INVALID TYPE OF ${type}`));
     }
   };
 

@@ -1,6 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const log = require('logbro');
+const session = require('express-session');
 
 const AuthService = require('../services').AuthService;
 
@@ -11,6 +12,7 @@ module.exports = Auth;
 Auth.init = function init(app){
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(session());
 };
 
 Auth.register = function register(req, res, next){

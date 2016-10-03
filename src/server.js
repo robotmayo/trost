@@ -1,30 +1,21 @@
-'use strict';
 const http = require('http');
-const nconf = require('nconf');
+const Router = require('express').Router;
 
-const express = require('express');
-const Router = express.Router;
-const session = require('express-session');
-const bodyparser = require('body-parser');
-const log = require('logbro');
+module.exports = function (App) {
+  const AuthRoutes = require('./routes/auth');
+  const TemplateService = require('./services').TemplateService;
+  return TemplateService
+  .setActiveTheme('friend')
+    .then(() => {
+      const server = http.createServer(App);
+      App.use(TemplateService.renderMiddleware);
+      AuthRoutes.init(App);
+      App.use(AuthRoutes.mountRoutes(Router()));
 
-nconf.argv().env().file(require('path').resolve(__dirname, '../config.json'));
+      App.get('/', function (req, res) {
+        res.trostRender('index', {});
+      });
+      return server;
+    });
 
-const AuthRoutes = require('./routes/auth');
-const TemplateService = require('./services').TemplateService;
-TemplateService.setActiveTheme('friend');
-
-const App = express();
-const server = http.createServer(App);
-App.use(TemplateService.renderMiddleware);
-AuthRoutes.init(App);
-App.use(AuthRoutes.mountRoutes(Router()));
-
-App.get('/', function(req, res){
-  res.trostRender('index', {});
-});
-
-server.listen(8000);
-log.info('Listening on 8000');
-
-
+};
