@@ -31,9 +31,9 @@ CREATE TABLE trost_users(
   lang VARCHAR(10) NOT NULL DEFAULT 'en_US', -- See data/user for all current types
   last_login DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  created_by INT NOT NULL,
+  created_by INT,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_by INT NOT NULL,
+  updated_by INT,
   visibility VARCHAR(50) NOT NULL DEFAULT 'public', -- See data/user for all default types
   UNIQUE INDEX `email`(`email`),
   UNIQUE INDEX `username`(`username`)
