@@ -30,8 +30,8 @@ module.exports = function (userOpts) {
 
   UserService.saveUser = function saveUser(email, username, password) {
     if (!email) throw new ValidationError('EMAIL REQUIRED');
-    if (!password) throw new ValidationError('PASSWORD REQUIRED');
     if (!username) throw new ValidationError('USERNAME REQUIRED');
+    if (!password) throw new ValidationError('PASSWORD REQUIRED');
     return query(UserService.connection, SAVE_USER, email, username, password)
       .then(results => results.insertId); //TODO: Handle insert failures
   };
