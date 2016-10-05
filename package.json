@@ -26,6 +26,7 @@
   "devDependencies": {
     "ava": "0.16.0",
     "documentation": "4.0.0-beta10",
-    "eslint": "^3.5.0"
+    "eslint": "^3.5.0",
+    "faker": "^3.1.0"
   }
 }
