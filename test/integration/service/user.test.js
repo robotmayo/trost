@@ -1,13 +1,14 @@
 import test from 'ava';
 import mysql from 'mysql';
 import faker from 'faker';
-import {NotFoundError} from '../../../src/utils/cerr';
+import {NotFoundError, ValidationError} from '../../../src/utils/cerr';
 
 const pool = mysql.createPool(require('../config.test.json').database);
 
 import UserServiceFn from '../../../src/services/user';
 
-function genUser(){
+
+function genUser() {
   return {
     id: -1,
     email: faker.internet.email(),
@@ -16,7 +17,7 @@ function genUser(){
   };
 }
 
-test('getUserBy*', async function(t){
+test('getUserBy*', async function (t) {
   const fakeUser = genUser();
   const UserService = UserServiceFn({connection: pool});
   const id = await UserService.saveUser(
@@ -31,7 +32,7 @@ test('getUserBy*', async function(t){
     await UserService.getUserById(-1);
     t.fail();
   } catch (err) {
-    if(err instanceof NotFoundError) return t.pass();
+    if (err instanceof NotFoundError) return t.pass();
     t.fail();
   }
 
@@ -48,8 +49,50 @@ test('getUserBy*', async function(t){
     await UserService.getUserByEmail('wOWOOWWOO');
     t.fail();
   } catch (err) {
-    if(err instanceof NotFoundError) return t.pass();
+    if (err instanceof NotFoundError) return t.pass();
     t.fail();
   }
 
+});
+
+test('saveUser', async function (t) {
+  const UserService = UserServiceFn({connection: pool});
+  const fakeUser = genUser();
+
+  // I mean realistically these are more unit tests but I see no reason
+  // in using a seperate file. Maybe later if things get more complex
+  try {
+    UserService.saveUser();
+  } catch (err) {
+    if (err instanceof ValidationError && err.message === 'EMAIL REQUIRED') {
+      t.pass();
+    } else {
+      t.fail(err.stack);
+    }
+  }
+
+  try {
+    UserService.saveUser('my email');
+  } catch (err) {
+    if (err instanceof ValidationError && err.message === 'USERNAME REQUIRED') {
+      t.pass();
+    } else {
+      t.fail(err.stack);
+    }
+  }
+
+  try {
+    UserService.saveUser('my email', 'my username');
+  } catch (err) {
+    if (err instanceof ValidationError && err.message === 'PASSWORD REQUIRED') {
+      t.pass();
+    } else {
+      t.fail(err.stack);
+    }
+  }
+
+  const id = await UserService.saveUser(fakeUser.email, fakeUser.username, fakeUser.password);
+  const user = await UserService.getUserById(id);
+  fakeUser.id = id;
+  t.deepEqual(user, fakeUser);
 });
