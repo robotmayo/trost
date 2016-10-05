@@ -4,6 +4,7 @@
   "description": "A nodejs blogging platform",
   "main": "index.js",
   "scripts": {
+    "pretest" : "mysql -u root trost_test < src/database/schema.sql",
     "test": "ava",
     "docs": "documentation build src/* -o docs -f html"
   },
