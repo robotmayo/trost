@@ -21,3 +21,25 @@ class ValidationError extends Error{
   }
 }
 module.exports.ValidationError = ValidationError;
+
+/**
+ * 
+ * 
+ * @class NotFoundError
+ * @extends {Error}
+ */
+class NotFoundError extends Error{
+  /**
+   * Creates an instance of NotFoundError.
+   * 
+   * @param {string} message
+   * 
+   * @memberOf NotFoundError
+   */
+  constructor(message){
+    super(message);
+    this.message = message;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+module.exports.NotFoundError = NotFoundError;
