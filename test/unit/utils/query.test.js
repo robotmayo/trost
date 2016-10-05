@@ -20,5 +20,4 @@ test('query.js', async function(t){
   }catch(e){
     t.pass();
   }
-
 });
