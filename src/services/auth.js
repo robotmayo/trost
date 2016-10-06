@@ -8,9 +8,9 @@ module.exports = function(authOpts) {
     SECRET: 'donttusttheclownq'
   }, authOpts);
 
-  AuthService.register = function register(email, password) {
+  AuthService.register = function register(email, username, password) {
     const hashedPW = bcrypt.hashSync(password);
-    return UserService.saveUser({email, password: hashedPW});
+    return UserService.saveUser(email, username, hashedPW);
   };
 
   AuthService.login = function login(email, password){
@@ -23,8 +23,8 @@ module.exports = function(authOpts) {
     });
   };
 
-  AuthService.passportLogin = function passportLogin(email, password, done) {
-    AuthService.login(email, password)
+  AuthService.localStrategy = function localStrategy(email, username, password, done) {
+    AuthService.login(email, username, password)
     .then(user => done({id: user.id}))
     .catch(done);
   };

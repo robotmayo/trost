@@ -23,7 +23,7 @@ function start(){
   .then(server => {
     App.server = server;
     server.listen(nconf.get('port'));
-    log.info(`Listening on 8000 ${nconf.get('port')}`);      
+    log.info(`Listening on ${nconf.get('port')}`);      
   })
   .catch(err => {
     log.error(`Start up failure ${err.stack}`);

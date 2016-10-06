@@ -12,19 +12,16 @@ module.exports = Auth;
 Auth.init = function init(app){
   app.use(passport.initialize());
   app.use(passport.session());
-  app.use(session());
+  app.use(session({secret: 'dontforgettoupdateme'}));
 };
 
-Auth.register = function register(req, res, next){
+Auth.postRegister = function register(req, res, next){
+  log.info(req.body, 'ADSGWSRGEWSRHGREW');
   if(!req.body.username) return res.redirect('/register');
   if(!req.body.password) return res.redirect('/register');
   if(!req.body.email) return res.redirect('/register');
-  const registerData = {
-    username: req.body.user,
-    password: req.body.password,
-    email: req.body.email
-  };
-  return Auth.registerUser(registerData)
+
+  return AuthService.register(req.body.email, req.body.username, req.body.password)
   .then(userData => {
     req.login(userData, err => {
       if(err) return next(err);
@@ -37,7 +34,7 @@ Auth.register = function register(req, res, next){
   });
 };
 
-Auth.login = function login(req, res){
+Auth.getLogin = function login(req, res){
   return res.trostRender('login');
 };
 
@@ -46,14 +43,19 @@ Auth.logout = function(req, res){
   res.redirect('/');
 };
 
+Auth.getRegister = function(req, res){
+  res.trostRender('register');
+};
+
 
 Auth.mountRoutes = function mountRoutes(router){
   //TODO: Dynamically load multiple strategies, eg : let people login via twitter to post a commnet
-  passport.use(new LocalStrategy(AuthService.passportLogin));
+  passport.use(new LocalStrategy(AuthService.localStrategy));
   //TODO: Properly handle redirects, eg send them back to the page they came from
   router.post('/login', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/login'}));
-  router.post('/register', Auth.register);
+  router.post('/register', Auth.postRegister);
   router.post('/logout', Auth.logout);
-  router.get('/login', Auth.login);
+  router.get('/login', Auth.getLogin);
+  router.get('/register', Auth.getRegister);
   return router;
 };
