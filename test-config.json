@@ -1,0 +1,11 @@
+{
+  "theme_path" : "/home/robotmayo/dev/trost/trost/theme",
+  "database" : {
+    "user" : "root",
+    "password" : "",
+    "database" : "trost_test",
+    "port" : "",
+    "host" : "localhost"
+  },
+  "port" : 8000
+}

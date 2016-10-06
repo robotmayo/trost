@@ -4,7 +4,7 @@
   "description": "A nodejs blogging platform",
   "main": "index.js",
   "scripts": {
-    "pretest" : "mysql -u root -e 'DROP DATABASE IF EXISTS `trost_test`; CREATE DATABASE trost_test;' && mysql -u root trost_test < src/database/schema.sql",
+    "pretest" : "node pretest.js",
     "test": "ava",
     "docs": "documentation build src/* -o docs -f html"
   },
