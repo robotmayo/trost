@@ -1,12 +1,13 @@
 import test from 'ava';
 import mysql from 'mysql';
 import faker from 'faker';
+import nconf from 'nconf';
+nconf.env('__').argv().file({file: '../../../test-config.json'});
 import {NotFoundError, ValidationError} from '../../../src/utils/cerr';
 
-const pool = mysql.createPool(require('../config.test.json').database);
+const pool = mysql.createPool(nconf.get('database'));
 
 import UserServiceFn from '../../../src/services/user';
-
 
 function genUser() {
   return {
