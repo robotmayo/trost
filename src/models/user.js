@@ -26,32 +26,32 @@ function gotResults(msg){
 }
 
 module.exports = function (userOpts) {
-  const UserService = Object.assign({connection: null}, userOpts);
+  const Model = Object.assign({connection: require('../db')}, userOpts);
 
-  UserService.saveUser = function saveUser(email, username, password) {
+  Model.saveUser = function saveUser(email, username, password) {
     if (!email) throw new ValidationError('EMAIL REQUIRED');
     if (!username) throw new ValidationError('USERNAME REQUIRED');
     if (!password) throw new ValidationError('PASSWORD REQUIRED');
-    return query(UserService.connection, SAVE_USER, email, username, password)
+    return query(Model.connection, SAVE_USER, email, username, password)
       .then(results => results.insertId); //TODO: Handle insert failures
   };
 
-  UserService.getUserBy = function getUserBy(type, ...args) {
+  Model.getUserBy = function getUserBy(type, ...args) {
     if (!type) throw new ValidationError('TYPE REQUIRED');
     switch (type) {
       case 'email':
-        return query(UserService.connection, GET_BY_EMAIL, args)
+        return query(Model.connection, GET_BY_EMAIL, args)
         .then(gotResults('USER_NOT_FOUND'));
       case 'id':
-        return query(UserService.connection, GET_BY_ID, args)
+        return query(Model.connection, GET_BY_ID, args)
           .then(gotResults('USER_NOT_FOUND'));
       default:
         return Promise.reject(new ValidationError(`INVALID TYPE OF ${type}`));
     }
   };
 
-  UserService.getUserByEmail = UserService.getUserBy.bind(null, 'email');
-  UserService.getUserById = UserService.getUserBy.bind(null, 'id');
+  Model.getUserByEmail = Model.getUserBy.bind(null, 'email');
+  Model.getUserById = Model.getUserBy.bind(null, 'id');
 
-  return UserService;
+  return Model;
 };
