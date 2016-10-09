@@ -4,8 +4,9 @@
   "description": "A nodejs blogging platform",
   "main": "index.js",
   "scripts": {
-    "pretest" : "node pretest.js",
-    "test": "ava",
+    "pretest": "node pretest.js",
+    "test": "nyc ava",
+    "report": "nyc report --reporter=html",
     "docs": "documentation build src/* -o docs -f html"
   },
   "author": "robotmayo",
@@ -28,6 +29,7 @@
     "ava": "0.16.0",
     "documentation": "4.0.0-beta10",
     "eslint": "^3.5.0",
-    "faker": "^3.1.0"
+    "faker": "^3.1.0",
+    "nyc": "^8.3.1"
   }
 }

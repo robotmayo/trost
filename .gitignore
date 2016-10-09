@@ -3,3 +3,5 @@ docs/
 .vscode/
 config.json
 *.log
+coverage
+.nyc_output
