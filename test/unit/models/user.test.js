@@ -2,6 +2,7 @@ import test from 'ava';
 import mysql from 'mysql';
 import faker from 'faker';
 import nconf from 'nconf';
+import {randomBytes} from 'crypto';
 nconf.env('__').argv().file({file: '../../../test-config.json'});
 import {NotFoundError, ValidationError} from '../../../src/utils/cerr';
 
@@ -12,9 +13,9 @@ import UserModelFn from '../../../src/models/user';
 function genUser() {
   return {
     id: -1,
-    email: faker.internet.email(),
-    username: faker.internet.userName(),
-    password: faker.internet.password()
+    email: randomBytes(8).toString('hex'),
+    username: randomBytes(8).toString('hex'),
+    password: randomBytes(8).toString('hex')
   };
 }
 
