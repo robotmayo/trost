@@ -24,7 +24,7 @@ module.exports = function(authOpts) {
   };
 
   AuthService.localStrategy = function localStrategy(usernameOrEmail, password, done) {
-    AuthService.login(usernameOrEmail, password)
+    return AuthService.login(usernameOrEmail, password)
     .then(user => done(null, {id: user.id}))
     .catch(done);
   };
@@ -34,7 +34,7 @@ module.exports = function(authOpts) {
   };
 
   AuthService.deserializeUser = function deserializeUser(id, done){
-    UserModel.getUserById(id)
+    return UserModel.getUserById(id)
     .then(userData => {
       done(null, userData);
     })
