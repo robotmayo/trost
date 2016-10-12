@@ -4,6 +4,7 @@ const log = require('logbro');
 const HOOK_TYPES = require('./constants').HOOK_TYPES;
 const HOOK_TYPES_ARR = [HOOK_TYPES.REDUCE, HOOK_TYPES.STATIC, HOOK_TYPES.ACTION];
 const DEFAULT_PRIORITY = 5;
+const {ValidationError} = require('../utils/cerr');
 
 module.exports = function hookInit(Plugins) {
   /**
@@ -31,10 +32,10 @@ module.exports = function hookInit(Plugins) {
    * @throws {Error}
    */
   function addHook(pluginID, opts) {
-    if (pluginID == null) throw new Error('PluginID required');
-    if (opts == null) throw new Error('opts is required');
-    if (!opts.hook || typeof opts.hook !== 'string') throw new Error('Hook is required');
-    if (!opts.fn || typeof opts.fn !== 'function') throw new Error('fn is required');
+    if (pluginID == null) throw new ValidationError('PluginID required');
+    if (opts == null) throw new ValidationError('opts is required');
+    if (!opts.hook || typeof opts.hook !== 'string') throw new ValidationError('Hook is required');
+    if (!opts.fn || typeof opts.fn !== 'function') throw new ValidationError('fn is required');
     const data = Object.assign({}, opts);
     data.priority = typeof data.priority === 'number' ? data.priority : DEFAULT_PRIORITY;
     data.id = pluginID;
@@ -67,7 +68,9 @@ module.exports = function hookInit(Plugins) {
    */
   function fireStaticHook(hooks, context) {
     return Promise.each(hooks, function staticHookEach(data) {
-      return data.fn(context)
+      // we cant guarantee that the function will return a Promise
+      // So we use join to 'wrap the value'
+      return Promise.join(data.fn(context))
         .timeout(5000)
         .catch(Promise.TimeoutError, function (err) {
           log.error(`Plugin failed to finish in time ${err.stack}`);
@@ -100,15 +103,36 @@ module.exports = function hookInit(Plugins) {
    */
   function fireHook(hook, context) {
     const hookType = hook.split('::')[0];
-    if (HOOK_TYPES_ARR.indexOf(hookType) === -1) return Promise.reject(new Error('Invalid hooktype'));
+    if (HOOK_TYPES_ARR.indexOf(hookType) === -1) return Promise.reject(new ValidationError('Invalid hooktype'));
     const hooks = Plugins.hookMap.get(hook);
     if (!hooks) return Promise.resolve(context);
     if (hookType === HOOK_TYPES.REDUCE) return fireReduceHook(hooks, context);
     else if (hookType === HOOK_TYPES.STATIC) return fireStaticHook(hooks, context);
     else if (hookType === HOOK_TYPES.ACTION) return fireActionHook(hooks, context);
-    return Promise.reject(new Error('Invalid hooktype'));
   }
   Plugins.fireHook = fireHook;
+
+  
+  /**
+   * 
+   * 
+   * @param {string} hook
+   * @param {Function} fn
+   * @returns {boolean} If the hook or function does not exist it returns false
+   */
+  function removeHook(hook, fn){
+    if(!fn) return false;
+    const hooks = Plugins.hookMap.get(hook);
+    if(!hooks) return false;
+    let removed = false;
+    Plugins.hookMap.set(hook, hooks.filter(hookData => {
+      if(removed) return true;
+      removed = hookData.fn === fn;
+      return !removed;
+    }));
+    return removed;
+  }
+  Plugins.removeHook = removeHook;
 
   return Plugins;
 
