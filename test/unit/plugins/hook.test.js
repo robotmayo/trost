@@ -1,4 +1,7 @@
 import test from 'ava';
+import Promise from 'bluebird';
+//Seems using 'native' promises doesnt work
+//when rejecting an async function?
 
 import Hook from '../../../src/plugins/hook';
 import {ValidationError} from '../../../src/utils/cerr';
@@ -94,3 +97,31 @@ test('removeHook', function(t){
   t.false(Plugins.removeHook(hook));
   t.false(Plugins.removeHook(hook, c => c));
 });
+
+test('fireReduceHook', async function(t){
+  const Plugins = Hook({});
+  const rHook = 'reduce::testa';
+  const adder = i => i + 1;
+  for(let i = 0; i < 10; i++){
+    Plugins.addHook(0, {hook: rHook, fn: adder});
+  }
+  const res = await Plugins.fireHook(rHook, 0);
+  t.is(res, 10);
+});
+
+test('fireReduceHook:throws', async function(t){
+  const Plugins = Hook({});
+  const throwHook = 'reduce::testb';
+  const throws = () => {
+    console.log('FFFF');
+    return Promise.reject(new Error('THROWN'));
+  };
+  Plugins.addHook(0, {hook: throwHook, fn: throws});
+  try{
+    await Plugins.fireHook(throwHook, Symbol('context'));
+    t.fail();
+  }catch(e){
+    t.is(e.message, 'THROWN');
+  }
+});
+
