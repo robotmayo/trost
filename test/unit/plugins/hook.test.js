@@ -113,7 +113,6 @@ test('fireReduceHook:throws', async function(t){
   const Plugins = Hook({});
   const throwHook = 'reduce::testb';
   const throws = () => {
-    console.log('FFFF');
     return Promise.reject(new Error('THROWN'));
   };
   Plugins.addHook(0, {hook: throwHook, fn: throws});
@@ -125,3 +124,32 @@ test('fireReduceHook:throws', async function(t){
   }
 });
 
+test('fireStaticHook', async function(t){
+  const Plugins = Hook({});
+  const staticHook = 'static::test';
+  const staticContext = Symbol('StaticContext');
+  t.plan(10);
+  for(let i = 0; i < 10; i++){
+    Plugins.addHook(0, {hook: staticHook, fn: ctx => t.is(ctx, staticContext)});
+  }
+  await Plugins.fireHook(staticHook, staticContext);
+});
+
+test('fireStaticHook:timeout', async function(t){
+  const Plugins = Hook({});
+  t.plan(2);
+  const staticHook = 'static::test';
+  const staticContext = Symbol('StaticContext');
+  const timesoutFn = ctx => {
+    t.is(ctx, staticContext);
+    return Promise.delay(6000);
+  };
+  const regularFn = ctx => {
+    t.is(ctx, staticContext);
+  };
+  // Delayed hook shouldnt slowdown the others
+  // need a way to test errored out :/
+  Plugins.addHook(0, {hook: staticHook, fn: timesoutFn});
+  Plugins.addHook(0, {hook: staticHook, fn: regularFn});
+  await Plugins.fireHook(staticHook, staticContext);
+});
