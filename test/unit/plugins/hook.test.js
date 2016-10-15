@@ -153,3 +153,16 @@ test('fireStaticHook:timeout', async function(t){
   Plugins.addHook(0, {hook: staticHook, fn: regularFn});
   await Plugins.fireHook(staticHook, staticContext);
 });
+
+test('fireActionHook', async function(t){
+  const Plugins = Hook({});
+  const rHook = 'action::test';
+  const staticContext = Symbol('static');
+  t.plan(11);
+  const callMe = ctx => t.is(ctx, staticContext);
+  for(let i = 0; i < 10; i++){
+    Plugins.addHook(0, {hook: rHook, fn: callMe});
+  }
+  const res = await Plugins.fireHook(rHook, staticContext);
+  t.is(res.length, 10);
+});
