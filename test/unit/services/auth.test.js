@@ -1,4 +1,3 @@
-import test from 'ava';
 import bcrypt from 'bcryptjs';
 import {randomBytes} from 'crypto';
 
@@ -18,7 +17,7 @@ function genUser() {
   };
 }
 
-test.beforeEach(async function (t) {
+beforeEach(async function () {
   const testUser = genUser();
   t.context.testUser = testUser;
   const AuthService = AuthServiceFn();
@@ -32,61 +31,61 @@ test.beforeEach(async function (t) {
     t.context.testUser.password);
 });
 
-test('register', async function (t) {
+it('register', async function () {
   const UserModel = t.context.UserModel;
   const userID = await t.context.register();
   const user = await UserModel.getUserById(userID);
-  t.true(bcrypt.compareSync(t.context.testUser.password, user.password));
+  expect(bcrypt.compareSync(t.context.testUser.password, user.password)).toBe(true);
 });
 
-test('login:username', async function (t) {
+it('login:username', async function () {
   const tc = t.context;
   const AuthService = tc.AuthService;
   const userID = await tc.register();
   tc.testUser.id = userID;
   const user = await AuthService.login(tc.testUser.username, tc.testUser.password);
-  t.is(user.id, tc.testUser.id);
+  expect(user.id).toBe(tc.testUser.id);
 });
 
-test('login:email', async function (t) {
+it('login:email', async function () {
   const tc = t.context;
   const AuthService = tc.AuthService;
   const userID = await tc.register();
   tc.testUser.id = userID;
   const user = await AuthService.login(tc.testUser.email, tc.testUser.password);
-  t.is(user.id, tc.testUser.id);
+  expect(user.id).toBe(tc.testUser.id);
 });
 
-test('localStrategy', async function(t){
+it('localStrategy', async function(){
   const tc = t.context;
   const userId = await tc.register();
   const done = (err, userObj) => {
-    t.deepEqual({id: userId}, userObj);
-    t.is(err, null);
+    expect({id: userId}).toEqual(userObj);
+    expect(err).toBe(null);
   };
   await tc.AuthService.localStrategy(tc.testUser.username, tc.testUser.password, done);
-  await tc.AuthService.localStrategy('-1', '', err => t.true(err instanceof NotFoundError));
-  await tc.AuthService.localStrategy(tc.testUser.username, '', err => t.true(err instanceof ValidationError));
+  await tc.AuthService.localStrategy('-1', '', err => expect(err instanceof NotFoundError).toBe(true));
+  await tc.AuthService.localStrategy(tc.testUser.username, '', err => expect(err instanceof ValidationError).toBe(true));
 });
 
-test('serializeUser', async function(t){
+it('serializeUser', async function(){
   await t.context
   .AuthService
   .serializeUser({id: 99}, (err, userId) => {
-    t.is(userId, 99);
-    t.is(err, null);
+    expect(userId).toBe(99);
+    expect(err).toBe(null);
   });
 });
 
-test('deserializeUser', async function(t){
+it('deserializeUser', async function(){
   const tc = t.context;
   const userId = await tc.register();
   await tc.AuthService.deserializeUser(userId, (err, userData) => {
-    t.is(err, null);
+    expect(err).toBe(null);
     const userDataNoP = Object.assign(userData, {password: ''});
     const tuNoP = Object.assign(tc.testUser, {password: ''});
     tuNoP.id = userId;
-    t.deepEqual(userDataNoP, tuNoP);
+    expect(userDataNoP).toEqual(tuNoP);
   });
-  await tc.AuthService.deserializeUser(-1, err => t.true(err instanceof NotFoundError));
+  await tc.AuthService.deserializeUser(-1, err => expect(err instanceof NotFoundError).toBe(true));
 });

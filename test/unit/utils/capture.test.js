@@ -1,12 +1,10 @@
-import test from 'ava';
-
 import capture from '../../../src/utils/capture';
 
-test('capture', function(t){
+it('capture', function(){
   const c = capture(() => {
     throw new Error();
   });
-  t.truthy(c.err);
+  expect(c.err).toBeTruthy();
   const v = capture(() => 'works');
-  t.is(v.value, 'works');
+  expect(v.value).toBe('works');
 });

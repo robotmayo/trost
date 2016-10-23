@@ -1,4 +1,3 @@
-import test from 'ava';
 import mysql from 'mysql';
 import faker from 'faker';
 import nconf from 'nconf';
@@ -19,7 +18,7 @@ function genUser() {
   };
 }
 
-test.beforeEach(async function (t) {
+beforeEach(async function () {
   const testUser = genUser();
   const UserModel = UserModelFn();
   const id = await UserModel.saveUser(testUser.email, testUser.username, testUser.password);
@@ -27,43 +26,43 @@ test.beforeEach(async function (t) {
   t.context.data = testUser;
 });
 
-test('getUserByEmail', async function (t) {
+it('getUserByEmail', async function () {
   const UserModel = UserModelFn();
   const testUser = t.context.data;  
   const user = await UserModel.getUserByEmail(testUser.email);
-  t.deepEqual(testUser, user);
+  expect(testUser).toEqual(user);
 });
 
-test('getUserById', async function (t) {
+it('getUserById', async function () {
   const UserModel = UserModelFn();
   const testUser = t.context.data;
   const user = await UserModel.getUserById(testUser.id);
-  t.deepEqual(testUser, user);
+  expect(testUser).toEqual(user);
 });
 
-test('getUserByUsernameOrEmail:Username', async function (t) {
+it('getUserByUsernameOrEmail:Username', async function () {
   const UserModel = UserModelFn();
   const testUser = t.context.data;
   const user = await UserModel.getUserByUsernameOrEmail(testUser.username);
-  t.deepEqual(testUser, user);
+  expect(testUser).toEqual(user);
 });
 
-test('getUserByUsernameOrEmail:Email', async function (t) {
+it('getUserByUsernameOrEmail:Email', async function () {
   const UserModel = UserModelFn();
   const testUser = t.context.data;
   const user = await UserModel.getUserByUsernameOrEmail(testUser.email);
-  t.deepEqual(testUser, user);
+  expect(testUser).toEqual(user);
 });
 
-test('ValidationError: Missing Type', async function (t) {
+it('ValidationError: Missing Type', async function () {
   const UserModel = UserModelFn();
-  const err = await t.throws(function () { UserModel.getUserBy(null); }, 'TYPE REQUIRED');
+  const err = await expect(function () { UserModel.getUserBy(null); }).toThrowError('TYPE REQUIRED');
 });
 
-test('ValidationError: Invalid Type', async function (t) {
+it('ValidationError: Invalid Type', async function () {
   const UserModel = UserModelFn();
   UserModel.getUserBy('abcd')
     .catch(e => {
-      t.deepEqual(e.message, 'INVALID TYPE OF abcd');
+      expect(e.message).toEqual('INVALID TYPE OF abcd');
     });
 });

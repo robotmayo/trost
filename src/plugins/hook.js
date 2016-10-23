@@ -31,12 +31,12 @@ module.exports = function hookInit(Plugins) {
    * @param  {function} opts.fn
    * @throws {Error}
    */
-  function addHook(pluginID, opts) {
+  function addHook(pluginID, hookObject) {
     if (pluginID == null) throw new ValidationError('PluginID required');
-    if (opts == null) throw new ValidationError('opts is required');
-    if (!opts.hook || typeof opts.hook !== 'string') throw new ValidationError('Hook is required');
-    if (!opts.fn || typeof opts.fn !== 'function') throw new ValidationError('fn is required');
-    const data = Object.assign({}, opts);
+    if (hookObject == null) throw new ValidationError('hookObject is required');
+    if (!hookObject.hook || typeof hookObject.hook !== 'string') throw new ValidationError('Hook is required');
+    if (!hookObject.fn || typeof hookObject.fn !== 'function') throw new ValidationError('fn is required');
+    const data = Object.assign({}, hookObject);
     data.priority = typeof data.priority === 'number' ? data.priority : DEFAULT_PRIORITY;
     data.id = pluginID;
     if (!Plugins.hookMap.has(data.hook)) Plugins.hookMap.set(data.hook, []);
@@ -104,6 +104,7 @@ module.exports = function hookInit(Plugins) {
   function fireHook(hook, context) {
     const hookType = hook.split('::')[0];
     if (HOOK_TYPES_ARR.indexOf(hookType) === -1) return Promise.reject(new ValidationError('Invalid hooktype'));
+    console.log(hookType);
     const hooks = Plugins.hookMap.get(hook);
     if (!hooks) return Promise.resolve(context);
     if (hookType === HOOK_TYPES.REDUCE) return fireReduceHook(hooks, context);
